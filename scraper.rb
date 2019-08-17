@@ -1,9 +1,8 @@
 # frozen_string_literal: true
 
 class Scraper
-  require "faraday"
-  require "nokogiri"
   require "fileutils"
+  require_relative "chapter"
 
   TEMPLATE = File.read("#{Dir.pwd}/page_template.html")
 
@@ -14,30 +13,26 @@ class Scraper
   end
 
   def perform
-    first_page = get_parsed_response(@init_link)
-    truyen_title_node = first_page.at_css("a.truyen-title")
-    truyen_title = truyen_title_node["title"]
+    first_chapter = Chapter.new(@init_link)
+    truyen_title = first_chapter.truyen_title
 
     last = false
     chapter_numbers = []
     link = @init_link
     while !last
-      chapter_number = link.scan(/\d/).join
-      chapter_numbers << chapter_number
-      page = get_parsed_response(link)
-      chapter_title_node = page.at_css(".chapter-title")
-      chapter_title = chapter_title_node["title"]
-      content_node = page.at_css(".chapter-c")
-      content = content_node.inner_html
+      chapter = Chapter.new(link)
+      number, title, content = chapter.info
 
-      file_name = "#{@truyen_path}/#{chapter_number}.html"
+      chapter_numbers << number
+
+      file_name = "#{@truyen_path}/#{number}.html"
       File.open(file_name, "w") do |f|
         fstring = TEMPLATE.gsub("{content}", content)
-                           .gsub("{h1}", chapter_title)
+                          .gsub("{h1}", title)
         f.write(fstring)
       end
 
-      next_chap_link = get_next_chap(page)
+      next_chap_link = chapter.next_chap_link
       if next_chap_link.empty?
         last = true
         break
@@ -76,20 +71,5 @@ class Scraper
         file = "#{@truyen_path}/#{chap}.html"
         FileUtils.mv(file, group_folder_path)
       end
-    end
-
-    def get_parsed_response(link)
-      res = get_response(link)
-      Nokogiri::HTML(res.body)
-    end
-
-    def get_response(link)
-      Faraday.get(link)
-    end
-
-    def get_next_chap(page)
-      next_chap_node = page.at_css("#next_chap")
-      return "" if next_chap_node["class"].include?("disabled")
-      next_chap_node["href"]
     end
 end
