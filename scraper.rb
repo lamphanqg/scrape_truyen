@@ -7,9 +7,10 @@ class Scraper
 
   TEMPLATE = File.read("#{Dir.pwd}/page_template.html")
 
-  def initialize(init_link, template_path, truyen_path)
+  def initialize(init_link, template_path, truyen_path, truyen_name)
     @init_link = init_link
     @truyen_path = truyen_path
+    @truyen_name = truyen_name
   end
 
   def perform
@@ -55,7 +56,7 @@ class Scraper
     end
 
     def generate_one_index(chapter_group, truyen_title)
-      group_title = "#{truyen_title}_#{chapter_group.first}_#{chapter_group.last}"
+      group_title = "#{@truyen_name}_#{chapter_group.first}_#{chapter_group.last}"
       group_index_path = "#{@truyen_path}/#{group_title}.html"
       group_folder_path = "#{@truyen_path}/#{chapter_group.first}_#{chapter_group.last}"
       Dir.mkdir(group_folder_path)
