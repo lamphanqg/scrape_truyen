@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative("scraper")
+require_relative("lib/scraper")
 
 init_link = "https://truyenfull.vn/that-tich-khong-mua/chuong-1/"
 truyen_name = "that_tich_khong_mua"
