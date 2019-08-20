@@ -21,16 +21,9 @@ class Scraper
     link = @init_link
     while !last
       chapter = Chapter.new(link)
-      number, title, content = chapter.info
-
+      number = chapter.number
       chapter_numbers << number
-
-      file_name = "#{@truyen_path}/#{number}.html"
-      File.open(file_name, "w") do |f|
-        fstring = TEMPLATE.gsub("{content}", content)
-                          .gsub("{h1}", title)
-        f.write(fstring)
-      end
+      process_one_chapter(chapter)
 
       next_chap_link = chapter.next_chap_link
       if next_chap_link.empty?
@@ -41,6 +34,7 @@ class Scraper
     end
 
     generate_index(chapter_numbers, truyen_title)
+    puts "DONE!"
   end
 
   private
@@ -51,6 +45,7 @@ class Scraper
     end
 
     def generate_one_index(chapter_group, truyen_title)
+      puts "Grouping chapters #{chapter_group.first} to #{chapter_group.last}"
       group_title = "#{@truyen_name}_#{chapter_group.first}_#{chapter_group.last}"
       group_index_path = "#{@truyen_path}/#{group_title}.html"
       group_folder_path = "#{@truyen_path}/#{chapter_group.first}_#{chapter_group.last}"
@@ -70,6 +65,20 @@ class Scraper
       chapter_group.each do |chap|
         file = "#{@truyen_path}/#{chap}.html"
         FileUtils.mv(file, group_folder_path)
+      end
+    end
+
+    def process_one_chapter(chapter)
+      number = chapter.number
+      title = chapter.title
+      content = chapter.content
+      puts "Process chapter #{number}"
+
+      file_name = "#{@truyen_path}/#{number}.html"
+      File.open(file_name, "w") do |f|
+        fstring = TEMPLATE.gsub("{content}", content)
+                          .gsub("{h1}", title)
+        f.write(fstring)
       end
     end
 end
