@@ -3,6 +3,7 @@
 class Scraper
   require "fileutils"
   require_relative "chapter"
+  require_relative "tools/ebook_convert"
 
   TEMPLATE = File.read("#{Dir.pwd}/page_template.html")
 
@@ -33,21 +34,22 @@ class Scraper
       link = next_chap_link
     end
 
-    generate_index(chapter_numbers, truyen_title)
+    generate_mobi_files(chapter_numbers, truyen_title)
     puts "DONE!"
   end
 
   private
-    def generate_index(chapter_numbers, truyen_title)
+    def generate_mobi_files(chapter_numbers, truyen_title)
       chapter_numbers.each_slice(50) do |chapter_group|
-        generate_one_index(chapter_group, truyen_title)
+        generate_one_mobi_file(chapter_group, truyen_title)
       end
     end
 
-    def generate_one_index(chapter_group, truyen_title)
+    def generate_one_mobi_file(chapter_group, truyen_title)
       puts "Grouping chapters #{chapter_group.first} to #{chapter_group.last}"
       group_title = "#{@truyen_name}_#{chapter_group.first}_#{chapter_group.last}"
-      group_index_path = "#{@truyen_path}/#{group_title}.html"
+      group_index_name = "#{group_title}.html"
+      group_index_path = "#{@truyen_path}/#{group_index_name}"
       group_folder_path = "#{@truyen_path}/#{chapter_group.first}_#{chapter_group.last}"
       Dir.mkdir(group_folder_path)
 
@@ -61,11 +63,15 @@ class Scraper
         f.write(fstring)
       end
 
-      FileUtils.mv(group_index_path, group_folder_path)
+      group_index_new_path = "#{group_folder_path}/#{group_index_name}"
+      FileUtils.mv(group_index_path, group_index_new_path)
       chapter_group.each do |chap|
         file = "#{@truyen_path}/#{chap}.html"
         FileUtils.mv(file, group_folder_path)
       end
+
+      mobi_file_path = "#{@truyen_path}/#{group_title}.mobi"
+      EbookConvert::html_to_mobi(group_index_new_path, mobi_file_path)
     end
 
     def process_one_chapter(chapter)
