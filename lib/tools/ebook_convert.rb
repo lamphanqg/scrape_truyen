@@ -4,11 +4,12 @@ module EbookConvert
   require "open3"
   def self.html_to_mobi(input_file, output_file)
     cmd = "ebook-convert #{input_file} #{output_file}"
+    puts "Converting #{input_file}\n        to #{output_file}"
     output, error, status = Open3.capture3(cmd)
     if status.success?
-      puts "Converted #{input_file} to #{output_file}"
+      puts "Conversion done"
     else
-      puts "Conversion of #{input_file} has error: #{error}"
+      puts "Conversion failed with error: #{error}"
     end
   end
 end
