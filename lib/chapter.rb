@@ -21,7 +21,11 @@ class Chapter
   end
 
   def number
-    @link.scan(/\d/).join
+    # "quyen-1-chuong-12" => "1_12"
+    # "chuong-1" => "1"
+    @link.scan(/[^\d]?\d+[^\d]?/)
+         .map{ |n| n.delete("^0-9") }
+         .join("_")
   end
 
   def title
