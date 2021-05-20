@@ -5,13 +5,17 @@ GEM
     faraday (0.15.4)
       multipart-post (>= 1.2, < 3)
     jaro_winkler (1.5.3)
-    mini_portile2 (2.4.0)
+    mini_portile2 (2.5.1)
     multipart-post (2.1.1)
-    nokogiri (1.10.3-x64-mingw32)
-      mini_portile2 (~> 2.4.0)
+    nokogiri (1.11.4)
+      mini_portile2 (~> 2.5.0)
+      racc (~> 1.4)
+    nokogiri (1.11.4-x64-mingw32)
+      racc (~> 1.4)
     parallel (1.17.0)
     parser (2.6.3.0)
       ast (~> 2.4.0)
+    racc (1.5.2)
     rack (2.0.7)
     rainbow (3.0.0)
     rubocop (0.73.0)
@@ -31,6 +35,7 @@ GEM
     unicode-display_width (1.6.0)
 
 PLATFORMS
+  ruby
   x64-mingw32
 
 DEPENDENCIES
